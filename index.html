@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F4">
+<title>物尽 · Minimal Living</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F4; --card:#FFFFFF; --ink:#2E2A24; --ink2:#544D42; --muted:#97907F;
+  --green:#4A6B57; --green2:#EAF1EC; --clay:#C77B4F; --gold:#B9975B;
+  --hair:rgba(46,42,36,.12); --trash:#B4543E;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans SC','PingFang SC',sans-serif;background:var(--bg);color:var(--ink);line-height:1.9;
+  padding:calc(env(safe-area-inset-top) + 26px) 0 100px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px}
+header{text-align:center;padding-top:8px}
+.kicker{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;letter-spacing:4px;color:var(--green);text-transform:uppercase}
+h1{font-family:'Noto Serif SC',serif;font-size:30px;font-weight:600;letter-spacing:8px;margin-top:10px}
+h1 i{font-style:normal;color:var(--green)}
+.sub{font-family:'Noto Serif SC',serif;font-size:12.5px;letter-spacing:3px;color:var(--muted);margin-top:8px}
+.rule{width:40px;height:1px;background:var(--ink);opacity:.22;margin:20px auto 0}
+/* 统计条 */
+.stats{display:flex;gap:0;background:var(--card);border:1px solid var(--hair);border-radius:18px;margin-top:24px;padding:14px 0;overflow:hidden}
+.stat{flex:1;text-align:center;border-right:1px solid var(--hair)}
+.stat:last-child{border-right:none}
+.stat b{display:block;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--green);line-height:1.3}
+.stat span{font-family:'Noto Sans SC',sans-serif;font-size:10.5px;letter-spacing:2px;color:var(--muted)}
+/* 添加区 */
+.addcard{background:var(--card);border:1px solid var(--hair);border-radius:20px;padding:20px;margin-top:16px}
+.addcard h3{font-family:'Noto Serif SC',serif;font-size:14.5px;font-weight:600;letter-spacing:3px;text-align:center;color:var(--ink)}
+#inp{width:100%;border:none;border-bottom:1.5px solid var(--hair);background:none;padding:12px 4px;font-family:'Noto Sans SC',sans-serif;
+  font-size:15px;color:var(--ink);outline:none;text-align:center;letter-spacing:1px;transition:border-color .2s}
+#inp:focus{border-bottom-color:var(--green)}
+#inp::placeholder{color:#B9B2A2}
+.addrow{display:flex;gap:12px;justify-content:center;margin-top:14px}
+.btn{border:none;cursor:pointer;font-family:'Noto Sans SC',sans-serif;font-weight:700;letter-spacing:2px;transition:all .2s}
+.btn.main{background:var(--green);color:#fff;font-size:13px;padding:11px 30px;border-radius:999px;box-shadow:0 4px 14px rgba(74,107,87,.25)}
+.btn.main:active{transform:scale(.96)}
+.btn.ghost{background:none;color:var(--muted);font-size:12px;padding:11px 16px;border-radius:999px}
+.orline{display:flex;align-items:center;gap:12px;margin:16px 0 12px;color:var(--muted);font-size:10.5px;letter-spacing:3px}
+.orline::before,.orline::after{content:'';flex:1;height:1px;background:var(--hair)}
+.dropzone{border:1.5px dashed rgba(74,107,87,.35);border-radius:14px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(74,107,87,.03)}
+.dropzone:hover,.dropzone.hot{background:rgba(74,107,87,.08);border-color:var(--green)}
+.dz-emoji{font-size:22px}
+.dz-t{font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--ink2);letter-spacing:1px;margin-top:2px}
+.dz-s{font-family:'Noto Sans SC',sans-serif;font-size:10.5px;color:var(--muted);margin-top:1px}
+#file{display:none}
+/* 图片预览 */
+.preview{display:none;align-items:center;gap:14px;margin-top:14px;background:var(--green2);border-radius:14px;padding:10px}
+.preview img{width:64px;height:64px;object-fit:cover;border-radius:10px}
+.preview .pname{flex:1}
+.preview input{width:100%;border:none;border-bottom:1px solid rgba(74,107,87,.3);background:none;padding:6px 2px;font-size:14px;outline:none;font-family:'Noto Sans SC',sans-serif;color:var(--ink)}
+.preview .okbtn{background:var(--green);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'Noto Sans SC',sans-serif}
+.preview .cancel{background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;margin-top:4px;font-family:'Noto Sans SC',sans-serif}
+/* 物品架 */
+.sechead{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--hair);padding-bottom:12px;margin:34px 0 16px}
+.sechead h2{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:600;letter-spacing:4px}
+.sechead .n{margin-left:auto;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--muted)}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.item{position:relative;background:var(--card);border:1px solid var(--hair);border-radius:16px;padding:14px 12px 12px;text-align:center;transition:all .25s}
+.item .im{-webkit-user-drag:none}
+.item .emoji{font-size:30px;line-height:1.4}
+.item img.im{width:100%;height:86px;object-fit:cover;border-radius:10px;margin-bottom:6px}
+.item .nm{font-family:'Noto Sans SC',sans-serif;font-size:13.5px;font-weight:700;color:var(--ink);margin-top:4px;letter-spacing:.5px}
+.item .meta{font-family:'Noto Sans SC',sans-serif;font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:3px}
+.item .cat{display:inline-block;font-family:'Noto Sans SC',sans-serif;font-size:9.5px;letter-spacing:1px;color:var(--green);background:var(--green2);border-radius:999px;padding:2px 10px;margin-top:6px}
+.item .acts{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.item .acts button{border:1px solid var(--hair);background:none;border-radius:999px;padding:5px 12px;font-size:10.5px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;letter-spacing:1px;color:var(--ink2);transition:all .2s}
+.item .acts .use:hover{border-color:var(--gold);color:var(--gold)}
+.item .acts .bye:hover{border-color:var(--trash);color:var(--trash)}
+.item.qty::after{content:attr(data-qty);position:absolute;top:-7px;right:-5px;background:var(--clay);color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:1px 7px;font-family:'Noto Sans SC',sans-serif}
+/* 告别动画 */
+.item.flying{position:fixed;z-index:80;pointer-events:none;transition:all .9s cubic-bezier(.5,-.3,.7,1);margin:0}
+.item.gone{animation:tobin .9s forwards}
+@keyframes tobin{40%{transform:translateY(-14px) rotate(-3deg)}100%{transform:translate(var(--dx),var(--dy)) rotate(50deg) scale(.05);opacity:0}}
+#binDock{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:79;font-size:30px;opacity:0;transition:all .3s;pointer-events:none}
+#binDock.show{opacity:1}
+#binDock.shake{animation:shake .5s}
+@keyframes shake{0%,100%{transform:translateX(-50%) rotate(0)}25%{transform:translateX(-50%) rotate(-8deg)}60%{transform:translateX(-50%) rotate(8deg)}}
+.item.used{animation:usedflash .9s forwards}
+@keyframes usedflash{30%{background:#FBF3DF;box-shadow:0 0 0 6px rgba(185,151,91,.15)}100%{opacity:0;transform:scale(.85)}}
+/* 告别区 */
+.archive{margin-top:14px}
+.arch-row{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px dashed var(--hair)}
+.arch-row .ae{font-size:20px;width:30px;text-align:center}
+.arch-row .ai{flex:1;min-width:0}
+.arch-row .an{font-family:'Noto Sans SC',sans-serif;font-size:13px;font-weight:700}
+.arch-row .am{font-family:'Noto Sans SC',sans-serif;font-size:10px;color:var(--muted);letter-spacing:.5px}
+.arch-row .how{font-family:'Noto Sans SC',sans-serif;font-size:10px;letter-spacing:1px;border-radius:999px;padding:2.5px 10px}
+.how.used{color:var(--gold);background:rgba(185,151,91,.12)}
+.how.gone{color:var(--trash);background:rgba(180,84,62,.1)}
+.empty{padding:40px 0;text-align:center;color:var(--muted);font-size:13px;letter-spacing:1px;font-family:'Noto Serif SC',serif}
+.clearA{background:none;border:none;color:var(--muted);font-size:10.5px;cursor:pointer;letter-spacing:1px;font-family:'Noto Sans SC',sans-serif;margin-left:10px}
+footer{margin-top:70px;text-align:center;font-family:'Noto Serif SC',serif;font-size:11.5px;color:var(--muted);letter-spacing:2px;line-height:2.2}
+footer .fine{display:block;font-family:'Noto Sans SC',sans-serif;font-size:10px;letter-spacing:1px;opacity:.75;margin-top:6px}
+#toast{position:fixed;left:50%;bottom:70px;transform:translate(-50%,14px);z-index:90;background:var(--ink);color:#FAF8F4;padding:11px 24px;border-radius:999px;font-size:12.5px;letter-spacing:2px;opacity:0;pointer-events:none;transition:all .3s;font-family:'Noto Sans SC',sans-serif}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.spark{position:fixed;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:95;animation:fall 1s forwards}
+@keyframes fall{to{transform:translateY(40vh) rotate(540deg);opacity:0}}
+.hidden{display:none!important}
+@media(max-width:480px){.shelf{grid-template-columns:repeat(2,1fr)}h1{font-size:26px;letter-spacing:6px}}
+</style>
+</head>
+<body>
+<div id="binDock">🗑️</div>
+<div class="wrap">
+  <header>
+    <div class="kicker">Minimal Living · Use It Up</div>
+    <h1>物<i>·</i>尽</h1>
+    <div class="sub">买进来的，用掉的，都算数</div>
+    <div class="rule"></div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="stInUse">0</b><span>在用</span></div>
+    <div class="stat"><b id="stMonthIn">0</b><span>本月进</span></div>
+    <div class="stat"><b id="stMonthOut">0</b><span>本月出</span></div>
+    <div class="stat"><b id="stAllOut">0</b><span>累计送别</span></div>
+  </div>
+
+  <div class="addcard">
+    <h3>新 到 一 件</h3>
+    <input id="inp" placeholder="买了什么？例如：两瓶洗发水、一支牙膏" autocomplete="off">
+    <div class="addrow">
+      <button class="btn main" id="addBtn">＋ 收进物品架</button>
+      <button class="btn ghost" id="clearInp">清空</button>
+    </div>
+    <div class="orline">或者</div>
+    <div class="dropzone" id="dropzone">
+      <div class="dz-emoji">📷</div>
+      <div class="dz-t">拍一张 / 上传图片</div>
+      <div class="dz-s">图片会存进这件物品的档案，配个名字就好</div>
+    </div>
+    <input type="file" id="file" accept="image/*">
+    <div class="preview" id="preview">
+      <img id="pvImg" alt="">
+      <div class="pname">
+        <input id="pvName" placeholder="它是什么？例如：羊绒围巾">
+        <button class="cancel" id="pvCancel">不收了</button>
+      </div>
+      <button class="okbtn" id="pvOk">收进物品架</button>
+    </div>
+  </div>
+
+  <div class="sechead"><h2>物品架</h2><span class="n" id="shelfN"></span></div>
+  <div class="shelf" id="shelf"></div>
+
+  <div class="sechead"><h2>告别记录</h2><span class="n" id="archN"></span><button class="clearA hidden" id="clearArch">清空记录</button></div>
+  <div class="archive" id="archive"></div>
+
+  <footer>
+    物尽其用，是对一件物品最大的尊重。<br>
+    <span class="fine">所有数据只存在这台设备上 · 极简生活的第一课：先看清拥有什么</span>
+  </footer>
+</div>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const S_KEY="wujin_v1";
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2000)}
+function spark(x,y,n=14){
+  const cs=["#4A6B57","#B9975B","#C77B4F","#97907F"];
+  for(let i=0;i<n;i++){
+    const s=document.createElement("div");s.className="spark";
+    s.style.left=(x-3+(Math.random()*56-28))+"px";s.style.top=(y-3+(Math.random()*36-18))+"px";
+    s.style.background=cs[i%4];s.style.width=s.style.height=(4+Math.random()*6)+"px";
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1050);
+  }
+}
+/* ============ 数据 ============ */
+let S;
+try{S=JSON.parse(localStorage.getItem(S_KEY))||null}catch(e){S=null}
+if(!S||!S.items)S={items:[],arch:[]};
+function save(){localStorage.setItem(S_KEY,JSON.stringify(S))}
+function daysSince(t){return Math.max(1,Math.floor((Date.now()-t)/864e5))}
+function monthKey(t){const d=new Date(t);return d.getFullYear()+"-"+(d.getMonth()+1)}
+const thisM=()=>{const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)};
+
+/* ============ 智能解析（文字） ============ */
+const CATS=[
+ ["洗护","🧴",["洗发水","沐浴露","牙膏","牙刷","洗面奶","护发素","肥皂","香皂","洗手液","洗衣液","洗衣粉","柔顺剂","牙刷头","牙线","漱口水","身体乳","护手霜","面霜","乳液","精华","防晒","卸妆水","化妆水","爽肤水","面膜","洗发","护发","沐浴"]],
+ ["食品","🍞",["牛奶","面包","鸡蛋","酸奶","米","面","面条","挂面","咖啡","咖啡豆","茶","茶叶","零食","饼干","水果","苹果","香蕉","橙子","蔬菜","肉","鱼","虾","油","盐","酱油","醋","糖","蜂蜜","燕麦","麦片","坚果","蛋糕","巧克力","牛奶盒","豆奶","豆浆","水","矿泉水","气泡水","饮料","果汁"]],
+ ["衣物","👕",["衣服","T恤","t桖","衬衫","裤子","裙子","外套","毛衣","卫衣","袜子","内衣","内裤","围巾","手套","帽子","鞋","鞋垫","帆布包","包","睡衣","羊绒","羽绒服","牛仔裤"]],
+ ["美妆","💄",["口红","唇膏","粉底","眼影","腮红","香水","眉笔","眼线","睫毛膏","化妆刷","美妆蛋","指甲油","卸妆棉","粉扑","发圈","发夹","梳子"]],
+ ["文具","✏️",["笔","钢笔","圆珠笔","中性笔","铅笔","笔记本","本子","便签","胶带","贴纸","尺子","橡皮","文件夹","订书机","信封","墨水"]],
+ ["数码","🔌",["手机","充电器","数据线","耳机","充电宝","电池","插线板","插座","鼠标","键盘","硬盘","u盘","内存卡","灯","灯泡","台灯"]],
+ ["家居","🪑",["纸巾","抽纸","卷纸","湿巾","垃圾袋","保鲜膜","保鲜袋","锡纸","抹布","洗碗布","海绵","拖把","扫把","收纳盒","收纳箱","衣架","挂钩","杯子","碗","筷子","盘子","锅","保鲜盒","香薰","蜡烛","花瓶","毛巾","浴巾","床单","被套","枕头","抱枕","地垫"]],
+ ["药品","💊",["药","感冒药","创可贴","体温计","口罩","维生素","泡腾片","藿香正气","碘伏","棉签","纱布"]]
+];
+const QTY_WORDS={"一":1,"半":1,"俩":2,"两":2,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10};
+function parseOne(seg){
+  let s=seg.trim().replace(/^(买了|新买的?|刚买的?|购入|入手|囤了|又买了|再买了)/,"").replace(/(了|一下|呗|啦|哈)$/,"").trim().replace(/半打/,"六");
+  if(!s)return null;
+  let qty=1;
+  const mNum=s.match(/^(\d+)\s*[个瓶支盒件包罐本双台条张杯听袋套]?(.*)$/);
+  const mCn=s.match(/^([一二两俩三四五六七八九十半]+)([瓶支盒件包罐本双台条张盒杯听袋个提包]*)/);
+  if(mNum){qty=parseInt(mNum[1]);s=mNum[2].trim()}
+  else if(mCn){qty=QTY_WORDS[mCn[1]]||1;s=s.slice(mCn[1].length).trim();if(mCn[2]&&s.startsWith(mCn[2]))s=s.slice(mCn[2].length).trim()}
+  else{const mTail=s.match(/(\d+)([瓶支盒件包罐本双台条张盒杯听袋个])$/);if(mTail){qty=parseInt(mTail[1]);s=s.slice(0,mTail.index).trim()}}
+  if(!s)return null;
+  let cat="其他",emoji="📦";
+  for(const[c,e,ws]of CATS){if(ws.some(w=>s.includes(w))){cat=c;emoji=e;break}}
+  return {name:s,cat:cat,emoji:emoji,qty:qty};
+}
+function parseInput(txt){
+  const parts=txt.split(/[，,、和跟还有\s]+/).map(x=>x.trim()).filter(Boolean);
+  const out=[];
+  parts.forEach(p=>{const r=parseOne(p);if(r)out.push(r)});
+  return out;
+}
+
+/* ============ 添加 ============ */
+function addParsed(list,img){
+  list.forEach(r=>{
+    S.items.push({id:Date.now()+Math.random().toString(36).slice(2,6),name:r.name,cat:r.cat,emoji:r.emoji,qty:r.qty||1,img:img||null,at:Date.now()});
+  });
+  save();renderAll();
+  toast(list.length>1?`收进 ${list.length} 件 —— 都登记了`:"收进物品架 —— 欢迎它");
+}
+$("#addBtn").addEventListener("click",()=>{
+  const t=$("#inp").value.trim();
+  if(!t)return toast("写点什么吧，例如：两瓶洗发水");
+  const list=parseInput(t);
+  if(!list.length)return toast("没认出来 —— 换个说法，或拆开来写");
+  addParsed(list);$("#inp").value="";
+});
+$("#inp").addEventListener("keydown",e=>{if(e.key==="Enter")$("#addBtn").click()});
+$("#clearInp").addEventListener("click",()=>{$("#inp").value=""});
+
+/* ============ 图片 ============ */
+let pvData=null;
+const dz=$("#dropzone"),file=$("#file");
+dz.addEventListener("click",()=>file.click());
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("hot")});
+dz.addEventListener("dragleave",()=>dz.classList.remove("hot"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("hot");if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0])});
+file.addEventListener("change",()=>{if(file.files[0])handleFile(file.files[0])});
+function handleFile(f){
+  if(!f.type.startsWith("image/"))return toast("只收图片哦");
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const w=Math.min(220,img.width),h=Math.round(img.height*w/img.width);
+      const cv=document.createElement("canvas");cv.width=w;cv.height=h;
+      cv.getContext("2d").drawImage(img,0,0,w,h);
+      pvData=cv.toDataURL("image/jpeg",.72);
+      $("#pvImg").src=pvData;$("#pvName").value="";
+      $("#preview").style.display="flex";$("#pvName").focus();
+    };
+    img.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+}
+$("#pvCancel").addEventListener("click",()=>{pvData=null;$("#preview").style.display="none";file.value=""});
+$("#pvOk").addEventListener("click",()=>{
+  const name=$("#pvName").value.trim();
+  if(!name)return toast("给它起个名字吧");
+  const guess=parseOne(name)||{name:name,cat:"其他",emoji:"📦",qty:1};
+  S.items.push({id:Date.now()+"p",name:guess.name,cat:guess.cat,emoji:guess.emoji,qty:guess.qty,img:pvData,at:Date.now()});
+  save();renderAll();
+  pvData=null;$("#preview").style.display="none";file.value="";
+  toast("收进物品架 —— 档案里有了它的照片");spark(innerWidth/2,innerHeight*.4,12);
+});
+
+/* ============ 渲染 ============ */
+function renderAll(){renderShelf();renderArch();renderStats()}
+function renderStats(){
+  $("#stInUse").textContent=S.items.length;
+  const m=thisM();
+  $("#stMonthIn").textContent=S.items.filter(i=>monthKey(i.at)===m).length;
+  $("#stMonthOut").textContent=S.arch.filter(i=>monthKey(i.at)===m).length;
+  $("#stAllOut").textContent=S.arch.length;
+}
+function renderShelf(){
+  const sh=$("#shelf");sh.innerHTML="";
+  $("#shelfN").textContent=S.items.length?S.items.length+" 件":"empty";
+  if(!S.items.length){sh.innerHTML='<div class="empty">物品架空着 —— 买回来的第一件，从上面登记开始</div>';return}
+  [...S.items].sort((a,b)=>b.at-a.at).forEach(it=>{
+    const el=document.createElement("div");el.className="item"+(it.qty>1?" qty":"");el.dataset.id=it.id;
+    el.dataset.qty=it.qty>1?"×"+it.qty:"";
+    const days=daysSince(it.at);
+    el.innerHTML=`${it.img?`<img class="im" src="${it.img}">`:`<div class="emoji">${it.emoji}</div>`}
+      <div class="nm">${it.name}</div>
+      <div class="meta">已伴你 ${days} 天 · ${new Date(it.at).getMonth()+1}月${new Date(it.at).getDate()}日 进</div>
+      <div class="cat">${it.cat}</div>
+      <div class="acts"><button class="use">✓ 用完了</button><button class="bye">🗑 断舍离</button></div>`;
+    el.querySelector(".use").addEventListener("click",e=>farewell(it.id,"used",e));
+    el.querySelector(".bye").addEventListener("click",e=>farewell(it.id,"gone",e));
+    sh.appendChild(el);
+  });
+}
+function farewell(id,how,e){
+  const el=document.querySelector(`.item[data-id="${id}"]`);
+  const it=S.items.find(x=>x.id===id);
+  if(!el||!it)return;
+  const dock=$("#binDock");
+  if(how==="gone"){
+    dock.classList.add("show");
+    const r=el.getBoundingClientRect(),dr=dock.getBoundingClientRect();
+    el.style.setProperty("--dx",(dr.left+dr.width/2-(r.left+r.width/2))+"px");
+    el.style.setProperty("--dy",(dr.top+dr.height/2-(r.top+r.height/2))+"px");
+    el.classList.add("gone");
+    setTimeout(()=>{dock.classList.add("shake");setTimeout(()=>dock.classList.remove("shake"),500)},850);
+    setTimeout(()=>dock.classList.remove("show"),1400);
+    var msg="送走了 · 轻轻松手";
+  }else{
+    el.classList.add("used");spark(e.clientX,e.clientY,12);
+    var msg="物尽其用 · 光荣退役";
+  }
+  setTimeout(()=>{
+    S.items=S.items.filter(x=>x.id!==id);
+    S.arch.unshift({name:it.name,cat:it.cat,emoji:it.emoji,img:it.img,how:how,at:Date.now()});
+    S.arch=S.arch.slice(0,60);save();renderAll();
+    toast(msg);if(how==="used")spark(innerWidth/2,innerHeight*.5,10);
+  },920);
+}
+function renderArch(){
+  const a=$("#archive");a.innerHTML="";
+  $("#archN").textContent=S.arch.length?S.arch.length+" 件":"empty";
+  $("#clearArch").classList.toggle("hidden",!S.arch.length);
+  if(!S.arch.length){a.innerHTML='<div class="empty">还没有告别 —— 每一件被用完的东西，都值得被记下来</div>';return}
+  S.arch.forEach(it=>{
+    const r=document.createElement("div");r.className="arch-row";
+    r.innerHTML=`<div class="ae">${it.img?`<img src="${it.img}" style="width:30px;height:30px;object-fit:cover;border-radius:8px">`:it.emoji}</div>
+      <div class="ai"><div class="an">${it.name}</div><div class="am">${new Date(it.at).getMonth()+1}月${new Date(it.at).getDate()}日 ${it.how==="used"?"用完":"送走"}</div></div>
+      <span class="how ${it.how}">${it.how==="used"?"✓ 物尽":"断舍离"}</span>`;
+    a.appendChild(r);
+  });
+}
+$("#clearArch").addEventListener("click",()=>{
+  if(!confirm("清空告别记录？过往就真正翻篇了。"))return;
+  S.arch=[];save();renderAll();toast("翻篇了");
+});
+renderAll();
+</script>
+</body>
+</html>
